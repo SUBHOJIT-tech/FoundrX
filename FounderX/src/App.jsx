@@ -336,3 +336,48 @@ const ChartComponent = ({ data }) => {
   const options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#9CA3AF'}, grid: {color: '#374151'} }, y: { ticks: { color: '#9CA3AF'}, grid: {color: '#374151'} } } };
   return <Line options={options} data={chartData} />;
 };
+import { useState } from 'react'
+import FeatureCard from './components/FeatureCard'
+
+function App() {
+  const [dark, setDark] = useState(false)
+
+  return (
+    <div className={dark ? 'dark' : ''}>
+      <div className="min-h-screen bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700 font-sans">
+        
+        {/* Navbar */}
+        <nav className="flex justify-between p-6">
+          <h1 className="text-2xl font-bold text-primary dark:text-white">FoundrX</h1>
+          <button
+            onClick={() => setDark(!dark)}
+            className="px-4 py-2 rounded-lg bg-accent text-white hover:bg-pink-400 transition"
+          >
+            {dark ? 'Light Mode' : 'Dark Mode'}
+          </button>
+        </nav>
+
+        {/* Hero Section */}
+        <section className="text-center py-20">
+          <h2 className="text-5xl font-bold text-primary dark:text-white mb-4">Welcome to FoundrX</h2>
+          <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
+            Interactive charts, insights & analytics in a beautiful UI
+          </p>
+          <button className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-600 transition">
+            Get Started
+          </button>
+        </section>
+
+        {/* Features / Cards Section */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-6 pb-20">
+          <FeatureCard title="Chart Analytics" description="Beautiful interactive charts using Chart.js" />
+          <FeatureCard title="PDF Export" description="Export your data with one click using html2pdf.js" />
+          <FeatureCard title="Responsive UI" description="Works on desktop & mobile flawlessly" />
+        </section>
+      </div>
+    </div>
+  )
+}
+
+export default App
+
