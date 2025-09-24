@@ -462,25 +462,3 @@ const ChartComponent = ({ data }) => {
   };
   return <Line options={options} data={chartData} />;
 };
-
-import React, { useState, useEffect } from 'react';
-import { auth } from './firebaseConfig'; // <-- correct import
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "firebase/auth";
-
-export default function App() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-      <h1 className="text-3xl font-bold">FounderX</h1>
-      {user && <p className="ml-4">Welcome, {user.email}</p>}
-    </div>
-  );
-}
