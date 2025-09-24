@@ -21,8 +21,8 @@ const ALPHA_VANTAGE_API_KEY = 'DNZ69Z27C64L5O0F';
 
 // --- SVG Icons ---
 const Logo = () => ( <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-400"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg> );
-const StartupIcon = () => ( <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> );
-const InvestmentIcon = () => ( <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> );
+const StartupIcon = () => ( <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> );
+const InvestmentIcon = () => ( <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> );
 
 // --- Main App Component ---
 export default function App() {
@@ -228,7 +228,7 @@ const StartupDashboard = () => {
 
     useEffect(() => {
         return () => { if (websocketRef.current) websocketRef.current.close(); };
-    }, []); // Changed dependency to empty array
+    }, []);
 
     const fetchGraphDataFromAI = async (domain) => {
        if (GEMINI_API_KEY === 'PASTE_YOUR_GEMINI_API_KEY_HERE') {setError("Error: Gemini API key is not set."); return null;}
@@ -278,9 +278,6 @@ const StartupDashboard = () => {
                 const aiGraphData = await fetchGraphDataFromAI(recData[0].domain);
                 if (aiGraphData) {
                     setTrendData(aiGraphData);
-                    // This part for live updates can be re-enabled if needed
-                    // const intervalId = setInterval(() => { ... });
-                    // websocketRef.current = { close: () => clearInterval(intervalId) };
                 }
             }
         } catch (err) {
