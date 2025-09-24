@@ -14,15 +14,15 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-// --- IMPORTANT: Paste your API Keys here ---
+// --- IMPORTANT: API Keys (Keep these safe in a real project) ---
 const GEMINI_API_KEY = 'AIzaSyAess2ePMCwpC1KMEtWYYRt6wl76H-rM9Y';
 const ALPHA_VANTAGE_API_KEY = 'DNZ69Z27C64L5O0F';
 
 
 // --- SVG Icons ---
 const Logo = () => ( <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-400"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg> );
-const StartupIcon = () => ( <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> );
-const InvestmentIcon = () => ( <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> );
+const StartupIcon = () => ( <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> );
+const InvestmentIcon = () => ( <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> );
 
 // --- Main App Component ---
 export default function App() {
@@ -48,7 +48,7 @@ export default function App() {
 }
 
 
-// --- REVAMPED: Investment Advisor Component with Alpha Vantage ---
+// --- Investment Advisor Component ---
 const InvestmentAdvisor = () => {
     const [budget, setBudget] = useState('10000');
     const [period, setPeriod] = useState('6 months');
@@ -58,7 +58,6 @@ const InvestmentAdvisor = () => {
     const [loadingMessage, setLoadingMessage] = useState('');
     const [error, setError] = useState('');
 
-    // --- Helper function to fetch Top Gaining stocks ---
     const fetchStockData = async () => {
         setLoadingMessage('Fetching real-time stock market data...');
         const url = `https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${ALPHA_VANTAGE_API_KEY}`;
@@ -69,7 +68,6 @@ const InvestmentAdvisor = () => {
                 console.warn("Alpha Vantage stock API limit reached or invalid response.");
                 return "Stock data not available at the moment (API limit may be reached).";
             }
-            // Return a formatted string of the top 5 gainers for the AI to analyze
             return data.top_gainers.slice(0, 5).map(stock => 
                 `Ticker: ${stock.ticker}, Price: ${stock.price}, Change: ${stock.change_percentage}`
             ).join('; ');
@@ -79,7 +77,6 @@ const InvestmentAdvisor = () => {
         }
     };
     
-    // --- Helper function to fetch Crypto data ---
     const fetchCryptoData = async () => {
         setLoadingMessage('Fetching latest cryptocurrency data...');
         const majorCryptos = ['BTC', 'ETH', 'SOL'];
@@ -90,19 +87,17 @@ const InvestmentAdvisor = () => {
                 const response = await fetch(url);
                 const data = await response.json();
                 if (data.note || !data['Realtime Currency Exchange Rate']) {
-                     console.warn(`Alpha Vantage crypto API limit reached for ${crypto}.`);
-                     continue; // Skip if limit reached for one crypto
+                       console.warn(`Alpha Vantage crypto API limit reached for ${crypto}.`);
+                       continue;
                 }
                 const details = data['Realtime Currency Exchange Rate'];
                 cryptoStrings.push(`${details['2. From_Currency Name']}: Price $${parseFloat(details['5. Exchange Rate']).toFixed(2)}`);
             } catch (err) {
                  console.error(`Alpha Vantage Crypto API Error for ${crypto}:`, err);
-                 // Don't throw error, just continue so the app doesn't crash
             }
         }
         return cryptoStrings.join('; ');
     };
-
 
     const parseAIResponse = (responseText) => {
         const sections = { stocks: [], crypto: [] };
@@ -118,7 +113,6 @@ const InvestmentAdvisor = () => {
         return sections;
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
@@ -132,18 +126,15 @@ const InvestmentAdvisor = () => {
         }
 
         try {
-            // Step 1: Fetch real-time data from Alpha Vantage
             const stockData = await fetchStockData();
             const cryptoData = await fetchCryptoData();
 
-            // Step 2: Send the real data to Gemini for analysis
             setLoadingMessage('Asking AI to analyze market data...');
             const systemPrompt = "You are an expert financial analyst. Based on the real-time market data provided, and considering the user's profile, suggest the top 2-3 stocks and top 2-3 cryptocurrencies. Provide a brief justification for each choice. Format your response using Markdown with two sections: '**Stocks**' and '**Cryptocurrency**'. List items in the format '* **Ticker/Name:** Justification.'";
             const userQuery = `USER PROFILE: Budget $${budget}, Time Period: ${period}, Risk Tolerance: ${risk}. --- REAL-TIME DATA: Top Gaining Stocks Today: [${stockData}]. Major Cryptocurrencies: [${cryptoData}]. --- Please provide your analysis and recommendations.`;
-
+            
             const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
             const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-
             const response = await fetch(geminiApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             
             if (!response.ok) throw new Error(`AI API Error: Status ${response.status}`);
@@ -189,7 +180,6 @@ const InvestmentAdvisor = () => {
             </div>
 
             {error && <div className="bg-red-900 border-red-700 text-red-200 px-4 py-3 rounded-lg mb-8">{error}</div>}
-
             {isLoading && <div className="text-center"><p className="text-lg text-gray-400 animate-pulse">{loadingMessage}</p></div>}
             
             {suggestions && (
@@ -223,9 +213,8 @@ const InvestmentAdvisor = () => {
 };
 
 
-// --- Startup Dashboard Component ---
+// --- Startup Dashboard Component (EDITED TO CONNECT TO YOUR BACKEND) ---
 const StartupDashboard = () => {
-    // ... (This component's code remains unchanged from the previous version)
     const [sector, setSector] = useState('AI');
     const [stage, setStage] = useState('Idea');
     const [recommendations, setRecommendations] = useState(null);
@@ -234,28 +223,31 @@ const StartupDashboard = () => {
     const [error, setError] = useState('');
     const websocketRef = useRef(null);
 
+    // This is your live backend URL from Render
+    const API_URL = 'https://foundrx-backend.onrender.com';
+
     useEffect(() => {
         return () => { if (websocketRef.current) websocketRef.current.close(); };
-    }, [recommendations]);
+    }, []); // Changed dependency to empty array
 
     const fetchGraphDataFromAI = async (domain) => {
-         if (GEMINI_API_KEY === 'PASTE_YOUR_GEMINI_API_KEY_HERE') {setError("Error: Gemini API key is not set."); return null;}
-        const prompt = `Generate a JSON object for a market growth trend for a "${domain}" startup. The JSON must have "labels" (12 months, e.g., "Oct '24") and "values" (12 numbers between 20-100, generally positive trend). Raw JSON only.`;
-        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
-        try {
-            const response = await fetch(geminiApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
-            if (!response.ok) {
-                let errorDetails = `Status: ${response.status}.`;
-                try {
-                    const errorData = await response.json();
-                    errorDetails += ` ${errorData.error.message}`;
-                } catch (e) { errorDetails += " Could not parse error response."; }
-                throw new Error(errorDetails);
-            }
-            const data = await response.json();
-            const rawJson = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-            return JSON.parse(rawJson);
-        } catch (err) { setError("Could not generate graph data from AI. " + err.message); return null; }
+       if (GEMINI_API_KEY === 'PASTE_YOUR_GEMINI_API_KEY_HERE') {setError("Error: Gemini API key is not set."); return null;}
+       const prompt = `Generate a JSON object for a market growth trend for a "${domain}" startup. The JSON must have "labels" (an array of 12 month strings, e.g., "Oct '24") and "values" (an array of 12 numbers between 20-100, showing a generally positive trend). Raw JSON only, no markdown.`;
+       const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+       try {
+           const response = await fetch(geminiApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
+           if (!response.ok) {
+               let errorDetails = `Status: ${response.status}.`;
+               try {
+                   const errorData = await response.json();
+                   errorDetails += ` ${errorData.error.message}`;
+               } catch (e) { errorDetails += " Could not parse error response."; }
+               throw new Error(errorDetails);
+           }
+           const data = await response.json();
+           const rawJson = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+           return JSON.parse(rawJson);
+       } catch (err) { setError("Could not generate graph data from AI. " + err.message); return null; }
     };
     
     const handleSubmit = async (e) => {
@@ -266,29 +258,37 @@ const StartupDashboard = () => {
         setTrendData(null);
         if (websocketRef.current) websocketRef.current.close();
 
-        const mockRecs = { AI: [{ domain: "AI-Powered Logistics", description: "Optimizing supply chains.", confidence: 95 }], Fintech: [{ domain: "DeFi Lending", description: "Peer-to-peer lending.", confidence: 92 }], HealthTech: [{ domain: "Telemedicine", description: "Remote patient care.", confidence: 94 }], Logistics: [{ domain: "Delivery Drones", description: "Automated delivery.", confidence: 88 }] };
-        const recData = mockRecs[sector];
-        setRecommendations(recData);
+        try {
+            // Fetch Recommendations from YOUR backend
+            const recResponse = await fetch(`${API_URL}/predictions/recommend`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sector, stage }),
+            });
 
-        if (recData.length > 0) {
-            const aiGraphData = await fetchGraphDataFromAI(recData[0].domain);
-            if (aiGraphData) {
-                setTrendData(aiGraphData);
-                const intervalId = setInterval(() => {
-                    setTrendData(currentData => {
-                        if (!currentData) return null;
-                        const newValues = [...currentData.values];
-                        newValues.push(Math.max(0, newValues[newValues.length - 1] + (Math.random() * 4 - 1.8)));
-                        const newLabels = [...currentData.labels];
-                        newLabels.push(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-                        if (newValues.length > 20) { newValues.shift(); newLabels.shift(); }
-                        return { labels: newLabels, values: newValues };
-                    });
-                }, 2500);
-                websocketRef.current = { close: () => clearInterval(intervalId) };
+            if (!recResponse.ok) {
+                const errorText = await recResponse.text();
+                throw new Error(`Failed to fetch recommendations. Server says: ${errorText}`);
             }
+            
+            const recData = await recResponse.json();
+            setRecommendations(recData);
+
+            if (recData && recData.length > 0) {
+                const aiGraphData = await fetchGraphDataFromAI(recData[0].domain);
+                if (aiGraphData) {
+                    setTrendData(aiGraphData);
+                    // This part for live updates can be re-enabled if needed
+                    // const intervalId = setInterval(() => { ... });
+                    // websocketRef.current = { close: () => clearInterval(intervalId) };
+                }
+            }
+        } catch (err) {
+            setError(err.message);
+            console.error("API Error:", err);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     return (
@@ -305,13 +305,14 @@ const StartupDashboard = () => {
              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
                     <h3 className="text-xl font-bold mb-4">Top Recommended Domain</h3>
-                    {isLoading && <div className="bg-gray-800 p-4 rounded-lg animate-pulse h-20"></div>}
-                    {recommendations && recommendations.map((rec, i) => <div key={i} className="bg-gray-800 p-4 rounded-lg"><h4 className="font-bold text-lg text-cyan-300">{rec.domain}</h4><p className="text-gray-400">{rec.description}</p></div>)}
+                    {isLoading && !recommendations && <div className="bg-gray-800 p-4 rounded-lg animate-pulse h-20"></div>}
+                    {recommendations && recommendations.map((rec, i) => <div key={i} className="bg-gray-800 p-4 rounded-lg mb-4"><h4 className="font-bold text-lg text-cyan-300">{rec.domain}</h4><p className="text-gray-400">{rec.description}</p></div>)}
+                    {!isLoading && !recommendations && <p className="text-gray-500">Your recommendations will appear here.</p>}
                 </div>
                 <div>
                     <h3 className="text-xl font-bold mb-4">Live Growth Trend</h3>
                     <div className="bg-gray-800 p-4 rounded-lg h-80 flex items-center justify-center">
-                        {isLoading && !trendData && <p className="text-gray-500">Generating AI chart...</p>}
+                        {isLoading && !trendData && <p className="text-gray-500 animate-pulse">Generating AI chart...</p>}
                         {trendData ? <ChartComponent data={trendData} /> : !isLoading && <p className="text-gray-500">AI-generated market trend will appear here.</p>}
                     </div>
                 </div>
@@ -338,4 +339,3 @@ const ChartComponent = ({ data }) => {
   const options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#9CA3AF'}, grid: {color: '#374151'} }, y: { ticks: { color: '#9CA3AF'}, grid: {color: '#374151'} } } };
   return <Line options={options} data={chartData} />;
 };
-
