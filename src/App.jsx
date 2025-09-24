@@ -12,33 +12,33 @@ import {
   Filler,
 } from 'chart.js';
 import { initializeApp } from "firebase/app";
-import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword, 
+    signOut, 
     onAuthStateChanged,
     sendPasswordResetEmail
 } from "firebase/auth";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-// --- SECURE: API Keys are now loaded from environment variables ---
+// --- IMPORTANT: Paste your Firebase and API Keys here ---
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyCGVraBP9KlP7xkES5NV8jEtPBRIji7o5o",
+  authDomain: "founderx-86f76.firebaseapp.com",
+  projectId: "founderx-86f76",
+  storageBucket: "founderx-86f76.firebasestorage.app",
+  messagingSenderId: "344725312338",
+  appId: "1:344725312338:web:da52086452829aca2a208b",
+  measurementId: "G-CMCTPDD4Y9"
 };
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const ALPHA_VANTAGE_API_KEY = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
+const GEMINI_API_KEY = 'AIzaSyAess2ePMCwpC1KMEtWYYRt6wl76H-rM9Y';
+const ALPHA_VANTAGE_API_KEY = 'DNZ69Z27C64L5O0F';
 
 // --- Configuration Check ---
-const isFirebaseConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("VITE_");
+const isFirebaseConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("PASTE_");
 
 let auth;
 if (isFirebaseConfigured) {
@@ -57,7 +57,7 @@ const Toast = ({ message, type, onClose }) => {
         return () => clearTimeout(timer);
     }, [onClose]);
     const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
-    return <div className={`fixed bottom-5 right-5 ${bgColor} text-white py-2 px-4 rounded-lg shadow-lg animate-slide-in-right z-50`}>{message}</div>;
+    return <div className={fixed bottom-5 right-5 ${bgColor} text-white py-2 px-4 rounded-lg shadow-lg animate-slide-in-right z-50}>{message}</div>;
 };
 
 // --- SVG Icons ---
@@ -71,8 +71,13 @@ const EyeClosedIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" 
 const ConfigurationErrorPage = () => (
     <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center text-white p-4 text-center">
         <Logo />
-        <h1 className="text-3xl font-bold text-red-500 mt-4">Configuration Error</h1>
-        <p className="mt-2 text-gray-300 max-w-lg">Could not find API keys. Please ensure you have a `.env.local` file in your project's `frontend` directory with the necessary keys.</p>
+        <h1 className="text-3xl font-bold text-red-500 mt-4">Configuration Required</h1>
+        <p className="mt-2 text-gray-300 max-w-lg">Welcome to FounderX! To get started, you need to add your Firebase and API keys to the frontend/src/App.jsx file.</p>
+        <div className="mt-6 p-4 bg-gray-800 rounded-lg text-left text-sm">
+            <p>1. Open the App.jsx file.</p>
+            <p>2. Find the firebaseConfig object and replace the placeholder values with your keys from the Firebase console.</p>
+            <p>3. Do the same for GEMINI_API_KEY and ALPHA_VANTAGE_API_KEY.</p>
+        </div>
     </div>
 );
 
@@ -97,7 +102,7 @@ export default function App() {
   const showToast = (message, type = 'error') => {
     setToast({ message, type });
   };
-
+  
   if (!isFirebaseConfigured) {
     return <ConfigurationErrorPage />;
   }
@@ -109,15 +114,14 @@ export default function App() {
   return (
     <>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      {!user
-        ? <AuthPage showToast={showToast} />
+      {!user 
+        ? <AuthPage showToast={showToast} /> 
         : <MainApp user={user} showToast={showToast} />
       }
     </>
   );
 }
 
-// ... (The rest of your components: AuthPage, Login, Signup, ForgotPassword, MainApp, etc. remain exactly the same) ...
 // --- Auth Page Component ---
 const AuthPage = ({ showToast }) => {
     const [authView, setAuthView] = useState('login');
@@ -175,10 +179,10 @@ const ForgotPassword = ({ setAuthView, showToast }) => {
     const [email, setEmail] = useState('');
     const handleReset = async (e) => { e.preventDefault(); try { await sendPasswordResetEmail(auth, email); showToast('Password reset email sent! Check your inbox.', 'success'); setAuthView('login'); } catch (err) { showToast('Could not send reset email. Please check the address.', 'error'); } };
     return (
-       <div>
+         <div>
             <h2 className="text-2xl font-bold text-center text-white mb-6">Reset Password</h2>
             <form onSubmit={handleReset} className="space-y-4">
-                <p className="text-sm text-gray-400 text-center">Enter your email address and we will send you a link to reset your password.</p>
+                 <p className="text-sm text-gray-400 text-center">Enter your email address and we will send you a link to reset your password.</p>
                 <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-3 bg-gray-700 rounded text-white" required />
                 <button type="submit" className="w-full p-3 bg-blue-600 rounded text-white font-bold hover:bg-blue-700">Send Reset Link</button>
             </form>
@@ -195,8 +199,8 @@ const MainApp = ({ user, showToast }) => {
     <div className="min-h-screen bg-gray-900 text-white font-sans">
       <nav className="bg-gray-800 p-4 flex justify-center items-center space-x-2 sticky top-0 z-50 shadow-lg">
         <div className="flex items-center absolute left-4"><Logo/><span className="text-xl font-bold ml-2 text-blue-400">FounderX</span></div>
-        <button onClick={() => setActiveTool('startup')} className={`px-4 py-2 rounded-md text-sm font-medium flex items-center transition ${activeTool === 'startup' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'}`}><StartupIcon /> Startup Advisor</button>
-        <button onClick={() => setActiveTool('investment')} className={`px-4 py-2 rounded-md text-sm font-medium flex items-center transition ${activeTool === 'investment' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'}`}><InvestmentIcon /> Investment Advisor</button>
+        <button onClick={() => setActiveTool('startup')} className={px-4 py-2 rounded-md text-sm font-medium flex items-center transition ${activeTool === 'startup' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'}}><StartupIcon /> Startup Advisor</button>
+        <button onClick={() => setActiveTool('investment')} className={px-4 py-2 rounded-md text-sm font-medium flex items-center transition ${activeTool === 'investment' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'}}><InvestmentIcon /> Investment Advisor</button>
         <div className="flex items-center absolute right-4">
             <span className="text-gray-300 text-sm mr-4 hidden md:block">{user.email}</span>
             <button onClick={handleLogout} className="px-3 py-1 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700">Logout</button>
@@ -219,14 +223,14 @@ const InvestmentAdvisor = () => {
 
     const fetchStockData = async () => {
         setLoadingMessage('Fetching real-time stock market data...');
-        const url = `https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${ALPHA_VANTAGE_API_KEY}`;
+        const url = https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=${ALPHA_VANTAGE_API_KEY};
         const response = await fetch(url);
         const data = await response.json();
         if (data.note || !data.top_gainers) {
             console.warn("Alpha Vantage stock API limit reached or invalid response.");
             return "Stock data not available (API limit may be reached).";
         }
-        return data.top_gainers.slice(0, 10).map(stock => `Ticker: ${stock.ticker}, Price: ${stock.price}, Change: ${stock.change_percentage}`).join('; ');
+        return data.top_gainers.slice(0, 10).map(stock => Ticker: ${stock.ticker}, Price: ${stock.price}, Change: ${stock.change_percentage}).join('; ');
     };
 
     const fetchCryptoData = async () => {
@@ -234,18 +238,18 @@ const InvestmentAdvisor = () => {
         const majorCryptos = ['BTC', 'ETH', 'SOL', 'DOGE'];
         let cryptoStrings = [];
         for (const crypto of majorCryptos) {
-            const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${crypto}&to_currency=USD&apikey=${ALPHA_VANTAGE_API_KEY}`;
+            const url = https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${crypto}&to_currency=USD&apikey=${ALPHA_VANTAGE_API_KEY};
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 if (data.note || !data['Realtime Currency Exchange Rate']) {
-                    console.warn(`Alpha Vantage crypto API limit reached for ${crypto}.`);
+                    console.warn(Alpha Vantage crypto API limit reached for ${crypto}.);
                     continue;
                 }
                 const details = data['Realtime Currency Exchange Rate'];
-                cryptoStrings.push(`${details['2. From_Currency Name']}: Price $${parseFloat(details['5. Exchange Rate']).toFixed(2)}`);
+                cryptoStrings.push(${details['2. From_Currency Name']}: Price $${parseFloat(details['5. Exchange Rate']).toFixed(2)});
             } catch (e) {
-                console.error(`Failed to fetch ${crypto}`);
+                console.error(Failed to fetch ${crypto});
             }
         }
         return cryptoStrings.join('; ');
@@ -258,13 +262,13 @@ const InvestmentAdvisor = () => {
             if (line.toLowerCase().includes('**stock')) currentSection = 'stocks';
             else if (line.toLowerCase().includes('**crypto')) currentSection = 'crypto';
             else if (line.startsWith('*') && currentSection) {
-                let match = line.match(/\* \*\*(.*?):\*\*\s?(.*)/);
+                let match = line.match(/\* \\(.?):\\\s?(.)/);
                 if (match) {
                     sections[currentSection].push({ name: match[1].trim(), reason: match[2].trim() });
                 } else {
-                    match = line.match(/\*\s(.*?):\s?(.*)/);
+                    match = line.match(/\\s(.?):\s?(.*)/);
                     if (match) {
-                        sections[currentSection].push({ name: match[1].replace(/\*\*/g, '').trim(), reason: match[2].trim() });
+                       sections[currentSection].push({ name: match[1].replace(/\\/g, '').trim(), reason: match[2].trim() });
                     }
                 }
             }
@@ -283,17 +287,17 @@ const InvestmentAdvisor = () => {
             setLoadingMessage('Asking AI to analyze market data...');
             const systemPrompt = `You are a sharp financial analyst. Your recommendations must be directly influenced by the user's profile and the provided real-time data. YOU MUST FOLLOW THE FORMATTING INSTRUCTIONS EXACTLY. Do not add any introduction or conclusion.
 
-    **FORMATTING RULES:**
-    - Create two sections: '**Stocks**' and '**Cryptocurrency**'.
+    *FORMATTING RULES:*
+    - Create two sections: '*Stocks' and 'Cryptocurrency*'.
     - Under each section, list 2-3 items.
     - Each item must be a bullet point starting with '*'.
     - The name/ticker MUST be bolded.
     - The final output for each item MUST look like this example:
-      * **AAPL:** With your moderate risk tolerance, Apple offers stability...
+      * *AAPL:* With your moderate risk tolerance, Apple offers stability...
 
     FAILURE TO FOLLOW THIS FORMAT WILL RESULT IN AN ERROR.`;
-            const userQuery = `**User Profile:** - Budget: $${budget} USD, Time: ${period}, Risk: ${risk}. **Real-Time Data:** - Stocks: [${stockData}], Crypto: [${cryptoData}]. Based only on this, provide a concise, actionable investment plan explicitly referencing the user's profile in your justification.`;
-            const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+            const userQuery = **User Profile:** - Budget: $${budget} USD, Time: ${period}, Risk: ${risk}. **Real-Time Data:** - Stocks: [${stockData}], Crypto: [${cryptoData}]. Based only on this, provide a concise, actionable investment plan explicitly referencing the user's profile in your justification.;
+            const geminiApiUrl = https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY};
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -304,7 +308,7 @@ const InvestmentAdvisor = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            if (!response.ok) throw new Error(`AI API Error: Status ${response.status}`);
+            if (!response.ok) throw new Error(AI API Error: Status ${response.status});
             const data = await response.json();
             const responseText = data.candidates[0].content.parts[0].text;
             setSuggestions(parseAIResponse(responseText));
@@ -349,8 +353,8 @@ const StartupDashboard = () => {
     }, []);
 
     const fetchGraphDataFromAI = async (domain) => {
-        const prompt = `Generate a plausible JSON object for a market growth trend for a "${domain}" startup. The trend should reflect a recent (hypothetical) market event. The JSON must have "labels" (12 months, e.g., "Oct '25") and "values" (12 numbers between 20-100). The data must be different each time this prompt is run. Raw JSON only.`;
-        const geminiApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+        const prompt = Generate a plausible JSON object for a market growth trend for a "${domain}" startup. The trend should reflect a recent (hypothetical) market event. The JSON must have "labels" (12 months, e.g., "Oct '25") and "values" (12 numbers between 20-100). The data must be different each time this prompt is run. Raw JSON only.;
+        const geminiApiUrl = https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY};
         try {
             const response = await fetch(geminiApiUrl, {
                 method: 'POST',
@@ -360,9 +364,9 @@ const StartupDashboard = () => {
                     generationConfig: { temperature: 0.9 }
                 })
             });
-            if (!response.ok) throw new Error(`AI API Error: Status ${response.status}`);
+            if (!response.ok) throw new Error(AI API Error: Status ${response.status});
             const data = await response.json();
-            const rawJson = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+            const rawJson = data.candidates[0].content.parts[0].text.replace(/json|/g, '').trim();
             return JSON.parse(rawJson);
         } catch (err) {
             setError("Could not generate graph data from AI. " + err.message);
