@@ -12,33 +12,33 @@ import {
   Filler,
 } from 'chart.js';
 import { initializeApp } from "firebase/app";
-import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut, 
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
     onAuthStateChanged,
     sendPasswordResetEmail
 } from "firebase/auth";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-// --- IMPORTANT: Paste your Firebase and API Keys here ---
+// --- SECURE: API Keys are now loaded from environment variables ---
 const firebaseConfig = {
-  apiKey: "AIzaSyCGVraBP9KlP7xkES5NV8jEtPBRIji7o5o",
-  authDomain: "founderx-86f76.firebaseapp.com",
-  projectId: "founderx-86f76",
-  storageBucket: "founderx-86f76.firebasestorage.app",
-  messagingSenderId: "344725312338",
-  appId: "1:344725312338:web:da52086452829aca2a208b",
-  measurementId: "G-CMCTPDD4Y9"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-const GEMINI_API_KEY = 'AIzaSyAess2ePMCwpC1KMEtWYYRt6wl76H-rM9Y';
-const ALPHA_VANTAGE_API_KEY = 'DNZ69Z27C64L5O0F';
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const ALPHA_VANTAGE_API_KEY = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY;
 
 // --- Configuration Check ---
-const isFirebaseConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("PASTE_");
+const isFirebaseConfigured = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("VITE_");
 
 let auth;
 if (isFirebaseConfigured) {
@@ -71,13 +71,8 @@ const EyeClosedIcon = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" 
 const ConfigurationErrorPage = () => (
     <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center text-white p-4 text-center">
         <Logo />
-        <h1 className="text-3xl font-bold text-red-500 mt-4">Configuration Required</h1>
-        <p className="mt-2 text-gray-300 max-w-lg">Welcome to FounderX! To get started, you need to add your Firebase and API keys to the `frontend/src/App.jsx` file.</p>
-        <div className="mt-6 p-4 bg-gray-800 rounded-lg text-left text-sm">
-            <p>1. Open the `App.jsx` file.</p>
-            <p>2. Find the `firebaseConfig` object and replace the placeholder values with your keys from the Firebase console.</p>
-            <p>3. Do the same for `GEMINI_API_KEY` and `ALPHA_VANTAGE_API_KEY`.</p>
-        </div>
+        <h1 className="text-3xl font-bold text-red-500 mt-4">Configuration Error</h1>
+        <p className="mt-2 text-gray-300 max-w-lg">Could not find API keys. Please ensure you have a `.env.local` file in your project's `frontend` directory with the necessary keys.</p>
     </div>
 );
 
@@ -102,7 +97,7 @@ export default function App() {
   const showToast = (message, type = 'error') => {
     setToast({ message, type });
   };
-  
+
   if (!isFirebaseConfigured) {
     return <ConfigurationErrorPage />;
   }
@@ -114,14 +109,15 @@ export default function App() {
   return (
     <>
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-      {!user 
-        ? <AuthPage showToast={showToast} /> 
+      {!user
+        ? <AuthPage showToast={showToast} />
         : <MainApp user={user} showToast={showToast} />
       }
     </>
   );
 }
 
+// ... (The rest of your components: AuthPage, Login, Signup, ForgotPassword, MainApp, etc. remain exactly the same) ...
 // --- Auth Page Component ---
 const AuthPage = ({ showToast }) => {
     const [authView, setAuthView] = useState('login');
@@ -179,10 +175,10 @@ const ForgotPassword = ({ setAuthView, showToast }) => {
     const [email, setEmail] = useState('');
     const handleReset = async (e) => { e.preventDefault(); try { await sendPasswordResetEmail(auth, email); showToast('Password reset email sent! Check your inbox.', 'success'); setAuthView('login'); } catch (err) { showToast('Could not send reset email. Please check the address.', 'error'); } };
     return (
-         <div>
+       <div>
             <h2 className="text-2xl font-bold text-center text-white mb-6">Reset Password</h2>
             <form onSubmit={handleReset} className="space-y-4">
-                 <p className="text-sm text-gray-400 text-center">Enter your email address and we will send you a link to reset your password.</p>
+                <p className="text-sm text-gray-400 text-center">Enter your email address and we will send you a link to reset your password.</p>
                 <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className="w-full p-3 bg-gray-700 rounded text-white" required />
                 <button type="submit" className="w-full p-3 bg-blue-600 rounded text-white font-bold hover:bg-blue-700">Send Reset Link</button>
             </form>
@@ -268,7 +264,7 @@ const InvestmentAdvisor = () => {
                 } else {
                     match = line.match(/\*\s(.*?):\s?(.*)/);
                     if (match) {
-                       sections[currentSection].push({ name: match[1].replace(/\*\*/g, '').trim(), reason: match[2].trim() });
+                        sections[currentSection].push({ name: match[1].replace(/\*\*/g, '').trim(), reason: match[2].trim() });
                     }
                 }
             }
