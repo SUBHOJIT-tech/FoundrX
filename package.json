@@ -11,9 +11,12 @@
     "tailwind-init": "tailwindcss init -p"
   },
 "dependencies": {
-  "firebase": "^10.x.x",
   "react": "^18.x.x",
-  "react-dom": "^18.x.x"
+  "react-dom": "^18.x.x",
+  "firebase": "^10.x.x",
+  "tailwindcss": "^3.x.x",
+  "postcss": "^8.x.x",
+  "autoprefixer": "^10.x.x"
 },
 "devDependencies": {
   "tailwindcss": "^3.x.x",
